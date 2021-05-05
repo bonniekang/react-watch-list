@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import PropTypes from "prop-types";
+import axios from "axios";
+import Movie from "./Movie";
 
 class App extends Component {
   state = {
@@ -7,16 +8,26 @@ class App extends Component {
     movies: []
   }
 
+  getMovies = async () => {
+    const {data: { results }} = await axios.get("https://api.themoviedb.org/3/movie/top_rated?api_key=f3e51bf3b1a3f8bcb87fc17f17ed8c28");
+    this.setState({movies:results, isLoading: false})
+  }
+
   componentDidMount(){
-    setTimeout(() => {
-      this.setState({ isLoading: false })
-    }, 6000)
+    this.getMovies();
   }
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, movies } = this.state;
     return (
       <div>
-        {isLoading ? "Loading..." : "Ready"}
+        {isLoading ? "Loading..." : movies.map(movie => (
+          <Movie 
+            id={movie.id}
+            key={movie.id}
+            summary={movie.overview} title={movie.title} 
+            poster={movie.poster_path}
+            />
+        ))}
       </div>
     );
   }
